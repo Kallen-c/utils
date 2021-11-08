@@ -1,6 +1,4 @@
 echo -e "\033[35m"
-echo -e "https://t.me/ro_cryptoo"
-echo -e "https://t.me/whitelistx1000"
 
 echo -ne "\033[35m██████╗░░█████╗░  "
 echo -e "\033[34m░█████╗░██████╗░██╗░░░██╗██████╗░████████╗░█████╗░"
