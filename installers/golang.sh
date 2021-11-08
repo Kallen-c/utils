@@ -1,7 +1,8 @@
 #!/bin/bash
 # Default variables
+function="install"
 go_version="1.17.2"
-uninstall="false"
+
 # Options
 . <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/colors.sh) --
 option_value(){ echo "$1" | sed -e 's%^--[^=]*=%%g; s%^-[^=]*=%%g'; }
@@ -23,7 +24,6 @@ while test $# -gt 0; do
 		echo
 		echo -e "${C_LGn}Useful URLs${RES}:"
 		echo -e "https://github.com/Kallen-c/utils/blob/main/installers/golang.sh - script URL"
-		echo -e "   "
 		echo
 		return 0 2>/dev/null; exit 0
 		;;
@@ -33,7 +33,7 @@ while test $# -gt 0; do
 		shift
 		;;
 	-u|--uninstall)
-		uninstall="true"
+		function="uninstall"
 		shift
 		;;
 	*|--)
@@ -41,22 +41,29 @@ while test $# -gt 0; do
 		;;
 	esac
 done
-# Actions
-if [ "$uninstall" = "true" ]; then
-	echo -e "${C_LGn}Uninstalling GO...${RES}"
-	sed -i "s%:`which go | sed 's%/bin/go%%g'`%%g" $HOME/.bash_profile
-	rm -rf `which go | sed 's%/bin/go%%g'`
-elif ! go version | grep -q $go_version; then
+
+# Functions
+install() {
 	echo -e "${C_LGn}GO installation...${RES}"
+	if ! go version | grep -q $go_version; then
+		sed -i "s%:`which go | sed 's%/bin/go%%g'`%%g" $HOME/.bash_profile
+		rm -rf `which go | sed 's%/bin/go%%g'`
+		sudo apt install tar wget -y
+		cd $HOME
+		wget "https://golang.org/dl/go${go_version}.linux-amd64.tar.gz"
+		sudo rm -rf /usr/local/go
+		sudo tar -C /usr/local -xzf "go${go_version}.linux-amd64.tar.gz"
+		rm "go${go_version}.linux-amd64.tar.gz"
+		. <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/miscellaneous/insert_variable.sh) -n "PATH" -v "$PATH:/usr/local/go/bin:$HOME/go/bin"
+	fi
+}
+uninstall() {
+	echo -e "${C_LGn}GO uninstalling...${RES}"
 	sed -i "s%:`which go | sed 's%/bin/go%%g'`%%g" $HOME/.bash_profile
 	rm -rf `which go | sed 's%/bin/go%%g'`
-	sudo apt install tar wget -y
-	cd $HOME
-	wget "https://golang.org/dl/go${go_version}.linux-amd64.tar.gz"
-	sudo rm -rf /usr/local/go
-	sudo tar -C /usr/local -xzf "go${go_version}.linux-amd64.tar.gz"
-	rm "go${go_version}.linux-amd64.tar.gz"
-	. <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/miscellaneous/insert_variable.sh) -n "PATH" -v "$PATH:/usr/local/go/bin:$HOME/go/bin"
-fi
+}
+
+# Actions
+$function
 . $HOME/.bash_profile
 echo -e "${C_LGn}Done!${RES}"

@@ -1,7 +1,8 @@
 #!/bin/bash
 # Default variables
+function="install"
 nvm_version="0.38.0"
-uninstall="false"
+
 # Options
 . <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/colors.sh) --
 option_value(){ echo "$1" | sed -e 's%^--[^=]*=%%g; s%^-[^=]*=%%g'; }
@@ -23,7 +24,6 @@ while test $# -gt 0; do
 		echo
 		echo -e "${C_LGn}Useful URLs${RES}:"
 		echo -e "https://github.com/Kallen-c/utils/blob/main/installers/nvm.sh - script URL"
-		echo -e "   "
 		echo
 		return 0 2>/dev/null; exit 0
 		;;
@@ -33,7 +33,7 @@ while test $# -gt 0; do
 		shift
 		;;
 	-u|--uninstall)
-		uninstall="true"
+		function="uninstall"
 		shift
 		;;
 	*|--)
@@ -41,18 +41,26 @@ while test $# -gt 0; do
 		;;
 	esac
 done
-# Actions
-if [ "$uninstall" = "true" ]; then
+
+# Functions
+install() {
+	echo -e "${C_LGn}NVM installation...${RES}"
+	if ! nvm --version | grep -q $nvm_version; then
+		sudo apt install wget -y
+		cd $HOME
+		. <(wget -qO- "https://raw.githubusercontent.com/nvm-sh/nvm/v${nvm_version}/install.sh")
+		export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+		[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+	fi
+}
+uninstall() {
 	echo -e "${C_LGn}Uninstalling NVM...${RES}"
 	rm -rf $NVM_DIR
+	sed -i "/NVM_DIR/d" $HOME/.bashrc
 	unset nvm
-elif ! nvm --version | grep -q $nvm_version; then
-	echo -e "${C_LGn}NVM installation...${RES}"
-	sudo apt install wget -y
-	cd $HOME
-	. <(wget -qO- "https://raw.githubusercontent.com/nvm-sh/nvm/v${nvm_version}/install.sh")
-	export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-	[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-fi
+}
+
+# Actions
+$function
 . $HOME/.bashrc
 echo -e "${C_LGn}Done!${RES}"
