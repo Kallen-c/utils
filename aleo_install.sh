@@ -72,7 +72,7 @@ WantedBy=multi-user.target" > /etc/systemd/system/aleod.service
 	sudo systemctl enable aleod
 	sudo systemctl restart aleod
 	. <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/miscellaneous/insert_variable.sh) -n aleo_log -v "sudo journalctl -fn 100 -u aleod" -a
-	. <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/miscellaneous/insert_variable.sh) -n aleo_node_info -v ". <(wget -qO- https://raw.githubusercontent.com/SecorD0/Aleo/main/node_info.sh) -l RU 2> /dev/null" -a
+	. <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/miscellaneous/insert_variable.sh) -n aleo_node_info -v ". <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/aleo_ni.sh) -l RU 2> /dev/null" -a
 	printf_n "${C_LGn}Done!${RES}"
 	printf_n "
 The miner was ${C_LGn}started${RES}.
