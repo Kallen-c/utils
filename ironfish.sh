@@ -90,6 +90,29 @@ function installSoftware {
 	cp $HOME/ironfish/ironfish-cli/bin/ironfish /usr/bin
 }
 
+function updateSoftware {
+	if [[ `service ironfishd-listener status | grep active` =~ "running" ]]; then
+	  sudo systemctl stop ironfishd-listener
+	  sudo systemctl disable ironfishd-listener
+	fi
+	sudo systemctl stop ironfishd ironfishd-miner
+	. $HOME/.bash_profile
+	. $HOME/.cargo/env
+	cp -r $HOME/.ironfish/accounts $HOME/ironfish_accounts_$(date +%s)
+	echo -e '\n\e[42mInstall software\e[0m\n' && sleep 1
+	# rm -r $HOME/.ironfish
+	cd $HOME
+	installDeps
+	rm -r ironfish
+	# git clone https://github.com/iron-fish/ironfish -b staging
+	git clone https://github.com/iron-fish/ironfish
+	cd $HOME/ironfish
+	# git reset --hard
+	# git pull origin staging
+	cargo install --force wasm-pack
+	yarn
+}
+
 function installService {
 echo -e '\n\e[42mRunning\e[0m\n' && sleep 1
 echo -e '\n\e[42mCreating a service\e[0m\n' && sleep 1
@@ -154,7 +177,7 @@ function deleteIronfish {
 }
 
 PS3='Please enter your choice (input your option number and press enter): '
-options=("Install" "Delete" "Quit")
+options=("Install" "Upgrade" "Delete" "Quit")
 select opt in "${options[@]}"
 do
     case $opt in
@@ -167,6 +190,15 @@ do
 			createConfig
 			installService
 			#installListener
+			break
+            ;;
+    "Upgrade")
+            echo -e '\n\e[33mYou choose upgrade...\e[0m\n' && sleep 1
+			setupVars
+			updateSoftware
+			installService
+			#installListener
+			echo -e '\n\e[33mYour node was upgraded!\e[0m\n' && sleep 1
 			break
             ;;
 		"Delete")
