@@ -18,8 +18,7 @@ cd ~/pontem-bootstrap && cp .env.testnet .env
 		echo 'export PONTEM_NODENAME='\"${PONTEM_NODENAME}\" >> $HOME/.bash_profile
 	fi
 
-
-	sed -i.bak -e "s/^NODE_NAME=my-node-name\"\"/NODE_NAME=$PONTEM_NODENAME/" $HOME/pontem-bootstrap/.env
+sed -i -e "s/NODE_NAME=my-node-name/NODE_NAME=$PONTEM_NODENAME/g" $HOME/pontem-bootstrap/.env
 
 cd ~/pontem-bootstrap && docker-compose build
  cd ~/pontem-bootstrap && \
