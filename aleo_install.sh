@@ -82,6 +82,30 @@ WantedBy=multi-user.target" > /etc/systemd/system/aleod.service
 	sudo systemctl daemon-reload
 	sudo systemctl enable aleod
 	sudo systemctl restart aleod
+
+
+printf "[Unit]
+Description=Aleo auto-updater
+After=network.target
+
+[Service]
+type=forking
+User=$USER
+Environment="HOME=$HOME"
+WorkingDirectory=$HOME
+ExecStartPre=`which wget` -qO $HOME/.aleo/multi_tool.sh https://raw.githubusercontent.com/SecorD0/Aleo/main/multi_tool.sh
+ExecStartPre=`which chmod` +x $HOME/.aleo/multi_tool.sh
+ExecStart=$HOME/.aleo/multi_tool.sh -u
+Restart=always
+RestartSec=1m
+
+[Install]
+WantedBy=multi-user.target" > /etc/systemd/system/aleou.service
+
+sudo systemctl daemon-reload
+sudo systemctl enable aleou
+sudo systemctl restart aleou
+
 	. <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/miscellaneous/insert_variable.sh) -n aleo_log -v "sudo journalctl -fn 100 -u aleod" -a
 	. <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/miscellaneous/insert_variable.sh) -n aleo_node_info -v ". <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/aleo_ni.sh) -l RU 2> /dev/null" -a
 	printf_n "${C_LGn}Done!${RES}"
