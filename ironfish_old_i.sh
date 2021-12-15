@@ -22,7 +22,6 @@ bash_profile=$HOME/.bash_profile
 if [ -f "$bash_profile" ]; then
     . $HOME/.bash_profile
 fi
-sleep 1 && curl -s https://api.nodes.guru/logo.sh | bash && sleep 3
 
 function setupVars {
 	if [ ! $IRONFISH_WALLET ]; then
