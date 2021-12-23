@@ -82,24 +82,35 @@ To restart the node: ${C_LGn}docker restart iron_fish_node${RES}
 update() {
 	printf_n "${C_LGn}Checking for update...${RES}"
 	status=`docker pull ghcr.io/iron-fish/ironfish:latest`
-	if ! grep -q "Image is up to date for" <<< "$status"; then
-		printf_n "${C_LGn}Updating...${RES}"
-		if docker ps -a | grep -q iron_fish_node; then
-			docker stop iron_fish_node
-			docker rm iron_fish_node
-			docker run -dit --name iron_fish_node --restart always --network host --volume $HOME/.ironfish:/root/.ironfish ghcr.io/iron-fish/ironfish:latest
-			printf_n "${C_LGn}The node was successfully updated!${RES}"
-		fi
-		if docker ps -a | grep -q iron_fish_miner; then
-			local threads=`docker inspect iron_fish_miner | jq -r ".[0].Config.Cmd[2]"`
-			docker stop iron_fish_miner
-			docker rm iron_fish_miner
-			docker run -dit --name iron_fish_miner --restart always --network host --volume $HOME/.ironfish:/root/.ironfish ghcr.io/iron-fish/ironfish:latest miners:start -t $threads
-			printf_n "${C_LGn}The miner was successfully updated!${RES}"
-		fi
-	else
-		printf_n "${C_LGn}Node version is current!${RES}"
-	fi
+	ironfish accounts:export $iron_fish_wallet_name "iron_fish_${iron_fish_wallet_name}.json"; \
+  docker cp iron_fish_node:/usr/src/app/iron_fish_${iron_fish_wallet_name}.json $HOME/iron_fish_${iron_fish_wallet_name}.json
+  docker rm iron_fish_node iron_fish_miner -f
+  docker pull ghcr.io/iron-fish/ironfish:latest
+  docker run -it --rm --network host -v $HOME/.ironfish:/root/.ironfish ghcr.io/iron-fish/ironfish:latest reset
+  docker run -dit --name iron_fish_node --restart always --network host -v $HOME/.ironfish:/root/.ironfish ghcr.io/iron-fish/ironfish:latest
+  docker cp $HOME/iron_fish_${iron_fish_wallet_name}.json iron_fish_node:/usr/src/app/iron_fish_${iron_fish_wallet_name}.json; \
+  ironfish accounts:import "iron_fish_${iron_fish_wallet_name}.json"; \
+  ironfish accounts:use $iron_fish_wallet_name
+  docker run -dit --name iron_fish_miner --restart always --network host -v $HOME/.ironfish:/root/.ironfish ghcr.io/iron-fish/ironfish:latest miners:start -t `bc <<< "$(lscpu --json | jq -r ".lscpu[4].data")-1"`
+
+#	if ! grep -q "Image is up to date for" <<< "$status"; then
+#		printf_n "${C_LGn}Updating...${RES}"
+#		if docker ps -a | grep -q iron_fish_node; then
+#			docker stop iron_fish_node
+#			docker rm iron_fish_node
+#			docker run -dit --name iron_fish_node --restart always --network host --volume $HOME/.ironfish:/root/.ironfish ghcr.io/iron-fish/ironfish:latest
+#			printf_n "${C_LGn}The node was successfully updated!${RES}"
+#		fi
+#		if docker ps -a | grep -q iron_fish_miner; then
+#			local threads=`docker inspect iron_fish_miner | jq -r ".[0].Config.Cmd[2]"`
+#			docker stop iron_fish_miner
+#			docker rm iron_fish_miner
+#			docker run -dit --name iron_fish_miner --restart always --network host --volume $HOME/.ironfish:/root/.ironfish ghcr.io/iron-fish/ironfish:latest miners:start -t $threads
+#			printf_n "${C_LGn}The miner was successfully updated!${RES}"
+#		fi
+#	else
+#		printf_n "${C_LGn}Node version is current!${RES}"
+#	fi
 }
 
 # Actions
