@@ -87,10 +87,20 @@ update() {
   docker rm iron_fish_node iron_fish_miner -f
   docker pull ghcr.io/iron-fish/ironfish:latest
   docker run -it --rm --network host -v $HOME/.ironfish:/root/.ironfish ghcr.io/iron-fish/ironfish:latest reset
+  sleep 1
+  printf_n "${C_LGn}step1...${RES}"
   docker run -dit --name iron_fish_node --restart always --network host -v $HOME/.ironfish:/root/.ironfish ghcr.io/iron-fish/ironfish:latest
+    sleep 1
+    printf_n "${C_LGn}step2...${RES}"
   docker cp $HOME/iron_fish_${iron_fish_wallet_name}.json iron_fish_node:/usr/src/app/iron_fish_${iron_fish_wallet_name}.json; \
+    sleep 1
+    printf_n "${C_LGn}step3...${RES}"
   ironfish accounts:import "iron_fish_${iron_fish_wallet_name}.json"; \
+    sleep 1
+    printf_n "${C_LGn}step4...${RES}"
   ironfish accounts:use $iron_fish_wallet_name
+    sleep 1
+    printf_n "${C_LGn}step5...${RES}"
   docker run -dit --name iron_fish_miner --restart always --network host -v $HOME/.ironfish:/root/.ironfish ghcr.io/iron-fish/ironfish:latest miners:start -t `bc <<< "$(lscpu --json | jq -r ".lscpu[4].data")-1"`
 
 #	if ! grep -q "Image is up to date for" <<< "$status"; then
