@@ -86,6 +86,8 @@ update() {
   docker cp iron_fish_node:/usr/src/app/iron_fish_${iron_fish_wallet_name}.json $HOME/iron_fish_${iron_fish_wallet_name}.json
   docker rm iron_fish_node iron_fish_miner -f
   docker pull ghcr.io/iron-fish/ironfish:latest
+    sleep 1
+    printf_n "${C_LGn}step0...${RES}"
   docker run -it --rm --network host -v $HOME/.ironfish:/root/.ironfish ghcr.io/iron-fish/ironfish:latest reset
   sleep 1
   printf_n "${C_LGn}step1...${RES}"
