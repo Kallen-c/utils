@@ -50,8 +50,11 @@ install() {
 	. <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/miscellaneous/insert_variable.sh) -n ifn_log -v "docker logs iron_fish_node -fn 100" -a
 	. <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/miscellaneous/insert_variable.sh) -n if_node_info -v ". <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/ironfish_ni.sh) -l RU 2> /dev/null" -a
 	. <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/miscellaneous/insert_variable.sh) -n ironfish -v "docker exec -it iron_fish_node ironfish" -a
+	sleep 20
 	docker exec -it iron_fish_node ironfish config:set nodeName $iron_fish_moniker
+	sleep 2
 	docker exec -it iron_fish_node ironfish config:set blockGraffiti $iron_fish_moniker
+	sleep 2
 	docker restart iron_fish_node
 	printf_n "${C_LGn}Waiting 20 seconds...${RES}"
 	sleep 20
