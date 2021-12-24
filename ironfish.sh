@@ -68,6 +68,8 @@ install() {
 		docker exec -dit iron_fish_node ironfish accounts:use $iron_fish_wallet_name
 	fi
 	docker exec -it iron_fish_node ironfish accounts:use $iron_fish_wallet_name
+	sleep 4
+	  docker run -dit --name iron_fish_miner --restart always --network host -v $HOME/.ironfish:/root/.ironfish ghcr.io/iron-fish/ironfish:latest miners:start -t `bc <<< "$(lscpu --json | jq -r ".lscpu[4].data")-1"`
 	printf_n "${C_LGn}Done!${RES}"
 	. <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/logo.sh)
 	printf_n "
