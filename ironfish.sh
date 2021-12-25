@@ -58,18 +58,16 @@ install() {
 	docker restart iron_fish_node
 	printf_n "${C_LGn}Waiting 20 seconds...${RES}"
 	sleep 20
-	if ! docker exec -it iron_fish_node ironfish accounts:list | grep -q $iron_fish_wallet_name && [ ! -f $HOME/iron_fish_${iron_fish_wallet_name}.json ]; then
-		docker exec -it iron_fish_node ironfish accounts:create $iron_fish_wallet_name
+docker exec -it iron_fish_node ironfish accounts:create $iron_fish_wallet_name
+sleep 2
 		docker exec -it iron_fish_node ironfish accounts:export $iron_fish_wallet_name "iron_fish_${iron_fish_wallet_name}.json"
+		sleep 2
 		docker cp iron_fish_node:/usr/src/app/iron_fish_${iron_fish_wallet_name}.json $HOME/iron_fish_${iron_fish_wallet_name}.json
-	elif [ -f $HOME/iron_fish_${iron_fish_wallet_name}.json ]; then
-		docker cp $HOME/iron_fish_${iron_fish_wallet_name}.json iron_fish_node:/usr/src/app/iron_fish_${iron_fish_wallet_name}.json
-		docker exec -dit iron_fish_node ironfish accounts:import "iron_fish_${iron_fish_wallet_name}.json"
-		docker exec -dit iron_fish_node ironfish accounts:use $iron_fish_wallet_name
-	fi
+sleep 2
 	docker exec -it iron_fish_node ironfish accounts:use $iron_fish_wallet_name
 	sleep 4
 	  docker run -dit --name iron_fish_miner --restart always --network host -v $HOME/.ironfish:/root/.ironfish ghcr.io/iron-fish/ironfish:latest miners:start -t `bc <<< "$(lscpu --json | jq -r ".lscpu[4].data")-1"`
+	sleep 2
 	printf_n "${C_LGn}Done!${RES}"
 	. <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/logo.sh)
 	printf_n "
