@@ -46,11 +46,15 @@ install() {
 	fi
 	sudo apt install wget jq bc build-essential -y
 	. <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/installers/docker.sh)
+	printf_n "${C_LGn}docker installed...${RES}"
+	sleep 2
 	docker run -dit --name iron_fish_node --restart always --network host --volume $HOME/.ironfish:/root/.ironfish ghcr.io/iron-fish/ironfish:latest
 	. <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/miscellaneous/insert_variable.sh) -n ifn_log -v "docker logs iron_fish_node -fn 100" -a
 	. <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/miscellaneous/insert_variable.sh) -n if_node_info -v ". <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/ironfish_ni.sh) -l RU 2> /dev/null" -a
 	. <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/miscellaneous/insert_variable.sh) -n ironfish -v "docker exec -it iron_fish_node ironfish" -a
+	printf_n "${C_LGn}container installed...${RES}"
 	sleep 20
+	printf_n "${C_LGn}exec config create...${RES}"
 	docker exec -it iron_fish_node ironfish config:set nodeName $iron_fish_moniker
 	sleep 2
 	docker exec -it iron_fish_node ironfish config:set blockGraffiti $iron_fish_moniker
@@ -58,6 +62,7 @@ install() {
 	docker restart iron_fish_node
 	printf_n "${C_LGn}Waiting 20 seconds...${RES}"
 	sleep 20
+	printf_n "${C_LGn}exec account create...${RES}"
 docker exec -it iron_fish_node ironfish accounts:create $iron_fish_wallet_name
 sleep 2
 		docker exec -it iron_fish_node ironfish accounts:export $iron_fish_wallet_name "iron_fish_${iron_fish_wallet_name}.json"
