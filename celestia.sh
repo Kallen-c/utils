@@ -114,3 +114,100 @@ CELESTIA_VALOPER=$(celestia-appd keys show $CELESTIA_WALLET --bech val -a)
 echo $CELESTIA_VALOPER
 echo 'export CELESTIA_VALOPER='${CELESTIA_VALOPER} >> $HOME/.bash_profile
 source $HOME/.bash_profile
+
+
+
+
+sleep 10
+
+
+
+#####
+cd $HOME
+rm -rf cd celestia-node
+git clone https://github.com/celestiaorg/celestia-node.git
+cd celestia-node
+git checkout v0.1.1
+make install
+
+celestia version
+
+TRUSTED_SERVER="localhost:26657"
+
+TRUSTED_HASH="$( curl -s $TRUSTED_SERVER/block?height=1 | jq -r .result.block_id.hash )"
+
+# check
+echo $TRUSTED_HASH
+# output example 4632277C441CA6155C4374AC56048CF4CFE3CBB2476E07A548644435980D5E17
+celestia full init --core.remote tcp://127.0.0.1:26657 --headers.trusted-hash $TRUSTED_HASH
+
+# config
+sed -i.bak -e 's/PeerExchange = false/PeerExchange = true/g' $HOME/.celestia-full/config.toml
+
+
+sudo tee /etc/systemd/system/celestia-full.service > /dev/null <<EOF
+[Unit]
+  Description=celestia-full node
+  After=network-online.target
+[Service]
+  User=$USER
+  ExecStart=$(which celestia) full start
+  Restart=on-failure
+  RestartSec=10
+  LimitNOFILE=4096
+[Install]
+  WantedBy=multi-user.target
+EOF
+
+sudo systemctl enable celestia-full
+sudo systemctl daemon-reload
+
+
+# start and save multiaddress
+sudo systemctl restart celestia-full && sleep 10 && journalctl -u celestia-full -o cat -n 100 --no-pager | grep -m 1 "*  /ip4/" > $HOME/multiaddress.txt
+
+TRUSTED_SERVER="localhost:26657"
+TRUSTED_HASH="$(curl -s $TRUSTED_SERVER/block?height=1 | jq -r .result.block_id.hash)"
+
+MULTIADDRESS="$(cat $HOME/multiaddress.txt | sed -r 's/^.{3}//')"
+
+# check variables
+echo -e "$MULTIADDRESS\n$TRUSTED_HASH"
+
+# output example
+# /ip4/194.163.191.41/tcp/2121/p2p/12D3KooWFWvUJDTx9pKAch4TW5if8YZwEKWQ8SFYVH2fRbN7vp4P
+# 4632277C441CA6155C4374AC56048CF4CFE3CBB2476E07A548644435980D5E17
+
+
+# IF OUTPUT OK! - DO NEXT ->
+
+rm -rf $HOME/.celestia-light
+
+celestia light init --headers.trusted-peer $MULTIADDRESS --headers.trusted-hash $TRUSTED_HASH
+
+sed -i.bak -e "s|BootstrapPeers = \[\]|BootstrapPeers = \[\"$MULTIADDRESS\"\]|g" $HOME/.celestia-light/config.toml
+
+sed -i.bak -e "s|MutualPeers = \[\]|MutualPeers = \[\"$MULTIADDRESS\"\]|g" $HOME/.celestia-light/config.toml
+
+sed -i.bak -e 's/PeerExchange = false/PeerExchange = true/g' $HOME/.celestia-light/config.toml
+
+sed -i.bak -e 's/Bootstrapper = false/Bootstrapper = true/g' $HOME/.celestia-light/config.toml
+
+sudo tee /etc/systemd/system/celestia-light.service > /dev/null <<EOF
+[Unit]
+  Description=celestia-light
+  After=network-online.target
+[Service]
+  User=$USER
+  ExecStart=$(which celestia) light start
+  Restart=on-failure
+  RestartSec=10
+  LimitNOFILE=4096
+[Install]
+  WantedBy=multi-user.target
+EOF
+
+sudo systemctl enable celestia-light
+sudo systemctl daemon-reload
+sudo systemctl restart celestia-light
+ #journalctl -u celestia-light -f -o cat
