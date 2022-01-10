@@ -73,6 +73,8 @@ sleep 2
 	sleep 4
 	  docker run -dit --name iron_fish_miner --restart always --network host -v $HOME/.ironfish:/root/.ironfish ghcr.io/iron-fish/ironfish:latest miners:start -t `bc <<< "$(lscpu --json | jq -r ".lscpu[4].data")-1"`
 	sleep 2
+	. <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/miscellaneous/insert_variable.sh) -n ifm_log -v "docker logs iron_fish_miner -f" -a
+	sleep 1
 	printf_n "${C_LGn}Done!${RES}"
 	. <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/logo.sh)
 	printf_n "
