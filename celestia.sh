@@ -28,10 +28,10 @@ cd $HOME
 rm -r networks
 git clone https://github.com/celestiaorg/networks.git
 
-		printf_n "${C_LGn}Enter a node name${RES}"
+		echo "Enter a node name: "
 		. <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/miscellaneous/insert_variable.sh) -n CELESTIA_NODENAME
-		printf_n "${C_LGn}Enter a wallet name${RES}"
-		. <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/miscellaneous/insert_variable.sh) -n iron_fish_wallet_name
+		echo "Enter a wallet name: "
+		. <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/miscellaneous/insert_variable.sh) -n CELESTIA_WALLET
 
 CELESTIA_CHAIN="devnet-2"  # do not change
 
@@ -92,7 +92,8 @@ EOF
 
 sudo systemctl enable celestia-appd
 sudo systemctl daemon-reload
-sudo systemctl restart celestia-appd && journalctl -u celestia-appd.service -f
+sudo systemctl restart celestia-appd
+#journalctl -u celestia-appd.service -f
 
 
 cd $HOME
