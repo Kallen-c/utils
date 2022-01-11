@@ -5,6 +5,10 @@ sudo apt update && sudo apt upgrade -y
 # Install packages
 sudo apt install curl tar wget clang pkg-config libssl-dev jq build-essential git make ncdu -y
 
+if [ -d $HOME/celestia-app/ ]; then
+  echo "app installed"
+else
+
 # Install GO 1.17.2
 ver="1.17.2"
 cd $HOME
@@ -120,47 +124,52 @@ source $HOME/.bash_profile
 
 sleep 10
 
+fi
 
 
-#####
-cd $HOME
-rm -rf cd celestia-node
-git clone https://github.com/celestiaorg/celestia-node.git
-cd celestia-node
-git checkout v0.1.1
-make install
+if [ -d $HOME/celestia-node/ ]; then
+  echo "node installed"
+else
+  #####
+  cd $HOME
+  rm -rf cd celestia-node
+  git clone https://github.com/celestiaorg/celestia-node.git
+  cd celestia-node
+  git checkout v0.1.1
+  make install
 
-celestia version
+  celestia version
 
-TRUSTED_SERVER="localhost:26657"
+  TRUSTED_SERVER="localhost:26657"
 
-TRUSTED_HASH="$( curl -s $TRUSTED_SERVER/block?height=1 | jq -r .result.block_id.hash )"
+  TRUSTED_HASH="$( curl -s $TRUSTED_SERVER/block?height=1 | jq -r .result.block_id.hash )"
 
-# check
-echo $TRUSTED_HASH
-# output example 4632277C441CA6155C4374AC56048CF4CFE3CBB2476E07A548644435980D5E17
-celestia full init --core.remote tcp://127.0.0.1:26657 --headers.trusted-hash $TRUSTED_HASH
+  # check
+  echo $TRUSTED_HASH
+  # output example 4632277C441CA6155C4374AC56048CF4CFE3CBB2476E07A548644435980D5E17
+  celestia full init --core.remote tcp://127.0.0.1:26657 --headers.trusted-hash $TRUSTED_HASH
 
-# config
-sed -i.bak -e 's/PeerExchange = false/PeerExchange = true/g' $HOME/.celestia-full/config.toml
+  # config
+  sed -i.bak -e 's/PeerExchange = false/PeerExchange = true/g' $HOME/.celestia-full/config.toml
 
 
-sudo tee /etc/systemd/system/celestia-full.service > /dev/null <<EOF
-[Unit]
-  Description=celestia-full node
-  After=network-online.target
-[Service]
-  User=$USER
-  ExecStart=$(which celestia) full start
-  Restart=on-failure
-  RestartSec=10
-  LimitNOFILE=4096
-[Install]
-  WantedBy=multi-user.target
+  sudo tee /etc/systemd/system/celestia-full.service > /dev/null <<EOF
+  [Unit]
+    Description=celestia-full node
+    After=network-online.target
+  [Service]
+    User=$USER
+    ExecStart=$(which celestia) full start
+    Restart=on-failure
+    RestartSec=10
+    LimitNOFILE=4096
+  [Install]
+    WantedBy=multi-user.target
 EOF
 
 sudo systemctl enable celestia-full
 sudo systemctl daemon-reload
+
 
 
 # start and save multiaddress
@@ -177,6 +186,10 @@ echo -e "$MULTIADDRESS\n$TRUSTED_HASH"
 # output example
 # /ip4/194.163.191.41/tcp/2121/p2p/12D3KooWFWvUJDTx9pKAch4TW5if8YZwEKWQ8SFYVH2fRbN7vp4P
 # 4632277C441CA6155C4374AC56048CF4CFE3CBB2476E07A548644435980D5E17
+
+fi
+
+
 
 
 # IF OUTPUT OK! - DO NEXT ->
