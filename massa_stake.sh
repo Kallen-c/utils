@@ -1,6 +1,7 @@
 #!/bin/bash
 
 sudo systemctl restart massad
+sleep 10
 massa_buy_rolls -mb
 
 
