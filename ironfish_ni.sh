@@ -89,18 +89,18 @@ main() {
 	local moniker=`$command config:get nodeName --no-color | tr -d '"' | tr -d '\r'`
 	local status=`$command status | tr -d '\r'`
 	local node_version=`echo "$status" | awk 'NR == 2 {print $2}'`
-	local latest_block_height=`echo "$status" | awk 'NR == 8 {print $(NF)}' | tr -d '(' | tr -d ')'`
-	if [ `echo "$status" | awk 'NR == 8 {print $2}'` = "SYNCED" ]; then
+	local latest_block_height=`echo "$status" | awk 'NR == 10 {print $(NF)}' | tr -d '(' | tr -d ')'`
+	if [ `echo "$status" | awk 'NR == 10 {print $2}'` = "SYNCED" ]; then
 		local catching_up="false"
 	else
 		local catching_up="true"
 	fi
-	if [ `echo "$status" | awk 'NR == 5 {print $4}'` -ge 1 ]; then
+	if [ `echo "$status" | awk 'NR == 7 {print $4}'` -ge 1 ]; then
 		local miner="true"
 	else
 		local miner="false"
 	fi
-	local blocks_mined=`echo "$status" | awk 'NR == 5 {print $6}'`
+	local blocks_mined=`echo "$status" | awk 'NR == 7 {print $6}'`
 	local wallet_name=`$command accounts:which | tr -d '\r'`
 	local wallet_address=`$command accounts:publickey | tr -d '\r' | awk '{print $(NF)}'`
 	local balance=`$command accounts:balance | tr -d '\r' | awk '{print $(NF-2)}'`
