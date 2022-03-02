@@ -35,18 +35,18 @@ done
 
 PS3='Select an action: '
 options=(
-"Обновление ATP"
-"Установка массы"
-"Выход")
+"Update ATP"
+"Setup Masa"
+"Exit")
 select opt in "${options[@]}"
 do
 case $opt in
 
 # ATP
 
-"Обновление ATP")
+"Update ATP")
 echo "============================================================"
-echo "ATP обновление началось"
+echo "ATP update started"
 echo "============================================================"
 sudo apt update && sudo apt upgrade -y
 sudo apt install curl tar wget clang pkg-config libssl-dev jq build-essential git make ncdu net-tools -y
@@ -61,24 +61,24 @@ echo "export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin" >> ~/.bash_profile
 source ~/.bash_profile
 go version
 echo "============================================================"
-echo "ATP обновилось"
+echo "ATP updated"
 echo "============================================================"
 break
 ;;
 
 #Instal
 
-"Установка Masa")
+"Setup Masa")
 
 echo "============================================================"
-echo "Имя ноды:"
+echo "Setup NodeName:"
 echo "============================================================"
 read MASA_NODENAME
 echo 'export MASA_NODENAME='${MASA_NODENAME} >> $HOME/.bash_profile
 source ~/.bash_profile
 
 echo "============================================================"
-echo "Начало установки ноды"
+echo "Node installation started"
 echo "============================================================"
 cd $HOME
 rm -rf masa-node-v1.0
@@ -131,11 +131,12 @@ sudo systemctl enable masad
 sudo systemctl restart masad
 
 echo "============================================================"
-echo "Проверка логов"
+echo "Checking the logs"
 echo "============================================================"
 journalctl -u masad -f -o cat | grep "new block"
 echo "============================================================"
-echo "Если ошибка в логах пиши в чат"
+echo "If there are no errors in the logs, congratulations, the node is
+installed. If you have any doubts - send screenshots to our support chat"
 echo "============================================================"
 break
 ;;
@@ -149,3 +150,9 @@ exit
 esac
 done
 done
+
+# Actions
+sudo apt install wget jq -y &>/dev/null
+. <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/logo.sh)
+if [ -f $HOME/iron_fish_${iron_fish_wallet_name}.txt ]; then mv $HOME/iron_fish_${iron_fish_wallet_name}.txt $HOME/iron_fish_${iron_fish_wallet_name}.json; fi
+$function
