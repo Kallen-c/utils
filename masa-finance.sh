@@ -1,35 +1,13 @@
 #!/bin/bash
-# Default variables
-function="install"
 
-# Options
-. <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/colors.sh) --
-option_value(){ echo "$1" | sed -e 's%^--[^=]*=%%g; s%^-[^=]*=%%g'; }
-while test $# -gt 0; do
-	case "$1" in
-	-h|--help)
-		. <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/logo.sh)
-		echo
-		echo -e "${C_LGn}Functionality${RES}: the script installs an Iron Fish node"
-		echo
-		echo -e "${C_LGn}Usage${RES}: script ${C_LGn}[OPTIONS]${RES}"
-		echo
-		echo -e "${C_LGn}Options${RES}:"
-		echo -e "  -h, --help            show the help page"
-		echo -e "  -u, --update          update the node"
-		echo
-		echo
-		return 0 2>/dev/null; exit 0
-		;;
-	-u|--update)
-		function="update"
-		shift
-		;;
-	*|--)
-		break
-		;;
-	esac
-done
+while true
+do
+
+#Logo
+
+echo "============================================================"
+curl -s https://raw.githubusercontent.com/Kallen-c/utils/main/colors.sh | bash
+echo "============================================================"
 
 #Menu
 
