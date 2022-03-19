@@ -1,0 +1,106 @@
+#!/bin/bash
+
+while true
+do
+
+# Logo
+
+echo "============================================================"
+. <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/logo.sh | bash
+echo "============================================================"
+
+
+PS3='Select an action: '
+options=("Prepare the server for installation" "Install GearNode" "Log Node" "Exit")
+select opt in "${options[@]}"
+               do
+                   case $opt in
+                   
+"Prepare the server for installation")
+               echo "============================================================"
+               echo "Preparation has begun"
+               echo "============================================================"
+               
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y git clang curl libssl-dev llvm libudev-dev
+
+curl https://sh.rustup.rs -sSf | sh
+source ~/.cargo/env
+
+rustup default stable
+rustup update
+rustup update nightly
+rustup target add wasm32-unknown-unknown --toolchain nightly
+
+
+
+               echo "============================================================"
+               echo "The server is ready!"
+               echo "============================================================"
+break
+;;
+            
+
+"Install GearNode")
+               echo "============================================================"
+               echo "Installation started"
+               echo "============================================================"
+               echo "============================================================"
+               echo "Your Node name:"
+               echo "============================================================"
+read GEARNODENAME
+echo 'export GEARNODENAME='${GEARNODENAME} >> $HOME/.bash_profile
+source ~/.bash_profile
+
+wget https://builds.gear.rs/gear-nightly-linux-x86_64.tar.xz && \
+tar xvf gear-nightly-linux-x86_64.tar.xz && \
+rm gear-nightly-linux-x86_64.tar.xz && \
+chmod +x $HOME/gear-node
+
+sudo tee <<EOF >/dev/null /etc/systemd/system/gear-node.service
+[Unit]
+Description=Gear Node
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/
+ExecStart=/root/gear-node \
+        --name $GEARNODENAME \
+        --execution wasm \
+        --log runtime \
+        --telemetry-url 'ws://telemetry-backend-shard.gear-tech.io:32001/submit 0'
+Restart=on-failure
+RestartSec=3
+LimitNOFILE=10000
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+echo "export GEARNODENAME="Kallen"" >> ~/.bash_profile
+
+sudo systemctl restart systemd-journald
+sudo systemctl daemon-reload
+sudo systemctl enable gear-node
+sudo systemctl restart gear-node
+
+break
+;;
+
+"Log Node")
+
+sudo journalctl -n 100 -f -u gear-node
+
+break
+;;
+
+"Exit")
+exit
+;;
+
+*) echo "invalid option $REPLY";;
+esac
+done
+done
