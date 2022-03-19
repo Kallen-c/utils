@@ -6,7 +6,7 @@ do
 # Logo
 
 echo "============================================================"
-. <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/logo.sh | bash
+curl -s https://raw.githubusercontent.com/Kallen-c/utils/main/logo.sh | bash
 echo "============================================================"
 
 
@@ -79,7 +79,7 @@ LimitNOFILE=10000
 WantedBy=multi-user.target
 EOF
 
-echo "export GEARNODENAME="Kallen"" >> ~/.bash_profile
+echo "export GEARNODENAME="forward-stake"" >> ~/.bash_profile
 
 sudo systemctl restart systemd-journald
 sudo systemctl daemon-reload
