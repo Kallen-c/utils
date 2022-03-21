@@ -6,7 +6,7 @@ do
 # Logo
 
 echo "============================================================"
-. <(wget -qO- https://raw.githubusercontent.com/Kallen-c/utils/main/logo.sh)
+curl -s https://raw.githubusercontent.com/Kallen-c/utils/main/logo.sh | bash
 echo "============================================================"
 
 
