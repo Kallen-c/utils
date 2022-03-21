@@ -5,9 +5,9 @@ do
 
 # Logo
 
-echo "============================================================"
+
 curl -s https://raw.githubusercontent.com/Kallen-c/utils/main/logo.sh | bash
-echo "============================================================"
+
 
 
 PS3='Select an action: '
